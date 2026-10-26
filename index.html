@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Biblioteca Digital: catálogo, préstamos, gestión de libros y resumen.">
+  <title>Biblioteca Digital</title>
+  <link rel="stylesheet" href="css/estilos.css">
+  <script src="js/datos.js" defer></script>
+  <script src="js/logica.js" defer></script>
+  <script src="js/interfaz.js" defer></script>
+</head>
+<body>
+  <header class="encabezado">
+    <a class="marca" href="#" aria-label="Biblioteca Digital, inicio" data-vista="catalogo">
+      <span class="marca-icono" aria-hidden="true">▤</span>
+      <span><strong>Biblioteca</strong><small> DIGITAL</small></span>
+    </a>
+    <div class="encabezado-acciones">
+      <button id="boton-tema" class="boton boton-icono boton-secundario" type="button" aria-label="Cambiar tema" title="Cambiar tema">◐</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="barra-lateral" aria-label="Navegación principal">
+      <p class="etiqueta-menu">MENÚ PRINCIPAL</p>
+      <nav class="navegacion">
+        <button class="enlace-nav activo" type="button" data-vista="catalogo"><span>▤</span> Catálogo</button>
+        <button class="enlace-nav" type="button" data-vista="prestamos"><span>↗</span> Préstamos</button>
+        <button class="enlace-nav" type="button" data-vista="formulario"><span>＋</span> Gestionar libros</button>
+        <button class="enlace-nav" type="button" data-vista="resumen"><span>▦</span> Resumen</button>
+      </nav>
+      <div class="nota-lateral">
+        <span aria-hidden="true">✦</span>
+        <strong>Tu espacio de lectura</strong>
+        <p>Organiza tus libros y lleva el control de cada préstamo.</p>
+      </div>
+      <p class="pie-lateral">Biblioteca Digital · 2026</p>
+    </aside>
+
+    <main id="contenido-principal" class="contenido">
+      <section id="vista-catalogo" class="vista activa" aria-labelledby="titulo-catalogo">
+        <div class="cabecera-vista">
+          <div>
+            <p class="sobretitulo">EXPLORA TU COLECCIÓN</p>
+            <h1 id="titulo-catalogo">Catálogo de libros</h1>
+            <p class="subtitulo">Encuentra un libro y consulta su disponibilidad.</p>
+          </div>
+          <button class="boton boton-principal" type="button" data-vista="formulario">＋ Agregar libro</button>
+        </div>
+        <div class="resumen-mini">
+          <article class="mini-card"><span class="mini-icono violeta">▤</span><div><span class="mini-label">Total de libros</span><strong id="total-libros">0</strong></div></article>
+          <article class="mini-card"><span class="mini-icono verde">✓</span><div><span class="mini-label">Disponibles</span><strong id="total-disponibles">0</strong></div></article>
+          <article class="mini-card"><span class="mini-icono naranja">↗</span><div><span class="mini-label">Prestados</span><strong id="total-prestados">0</strong></div></article>
+        </div>
+        <div class="panel">
+          <div class="herramientas">
+            <label class="buscador"><span aria-hidden="true">⌕</span><input id="buscar-libros" type="search" placeholder="Buscar por título o autor..." aria-label="Buscar libros"></label>
+            <select id="filtro-genero" aria-label="Filtrar por género"><option value="">Todos los géneros</option></select>
+            <select id="filtro-estado" aria-label="Filtrar por disponibilidad">
+              <option value="">Todos los estados</option><option value="disponible">Disponible</option><option value="prestado">Prestado</option><option value="coleccion">Colección</option>
+            </select>
+            <select id="ordenar-por" aria-label="Ordenar por">
+              <option value="titulo">Título</option><option value="autor">Autor</option><option value="anio">Año</option><option value="genero">Género</option>
+            </select>
+            <select id="direccion-orden" aria-label="Dirección del orden">
+              <option value="asc">A–Z / menor a mayor</option><option value="desc">Z–A / mayor a menor</option>
+            </select>
+          </div>
+          <div id="lista-libros" class="rejilla-libros" aria-live="polite"></div>
+          <p id="mensaje-catalogo-vacio" class="vacio oculto">No se encontraron libros con esos criterios.</p>
+        </div>
+      </section>
+
+      <section id="vista-prestamos" class="vista" aria-labelledby="titulo-prestamos">
+        <div class="cabecera-vista"><div><p class="sobretitulo">SEGUIMIENTO</p><h1 id="titulo-prestamos">Préstamos</h1><p class="subtitulo">Consulta préstamos activos y el historial de devoluciones.</p></div></div>
+        <div class="panel">
+          <div class="pestanas" role="group" aria-label="Filtrar préstamos">
+            <button class="pestana activa" data-filtro-prestamo="activos" type="button">Activos</button>
+            <button class="pestana" data-filtro-prestamo="vencidos" type="button">Vencidos</button>
+            <button class="pestana" data-filtro-prestamo="historial" type="button">Historial</button>
+          </div>
+          <div id="lista-prestamos" class="lista-prestamos" aria-live="polite"></div>
+          <p id="mensaje-prestamos-vacio" class="vacio oculto">No hay préstamos para mostrar en esta sección.</p>
+        </div>
+      </section>
+
+      <section id="vista-formulario" class="vista" aria-labelledby="titulo-formulario">
+        <div class="cabecera-vista"><div><p class="sobretitulo">ADMINISTRACIÓN</p><h1 id="titulo-formulario">Gestionar libros</h1><p class="subtitulo">Agrega un libro nuevo o edita uno existente.</p></div></div>
+        <div class="panel formulario-panel">
+          <form id="formulario-libro" novalidate>
+            <input id="id-libro" type="hidden">
+            <div class="campo campo-completo"><label for="titulo-libro">Título <span>*</span></label><input id="titulo-libro" name="titulo" type="text" minlength="3" maxlength="60" required placeholder="Ej. Cien años de soledad"><small>Entre 3 y 60 caracteres.</small></div>
+            <div class="campo"><label for="autor-libro">Autor <span>*</span></label><input id="autor-libro" name="autor" type="text" required maxlength="60" placeholder="Nombre del autor"></div>
+            <div class="campo"><label for="anio-libro">Año de publicación <span>*</span></label><input id="anio-libro" name="anio" type="number" min="1000" max="2026" required placeholder="Ej. 1967"><small>Entre 1000 y 2026.</small></div>
+            <div class="campo"><label for="genero-libro">Género <span>*</span></label><select id="genero-libro" name="genero" required><option value="">Selecciona un género</option><option>Novela</option><option>Ciencia</option><option>Historia</option><option>Fantasía</option><option>Romance</option><option>Ensayo</option><option>Poesía</option><option>Otro</option></select></div>
+            <label class="casilla campo-completo"><input id="coleccion-libro" type="checkbox"><span>Este libro pertenece a la colección (no se presta).</span></label>
+            <div class="acciones-formulario campo-completo"><button id="guardar-libro" class="boton boton-principal" type="submit">Guardar libro</button><button id="cancelar-edicion" class="boton boton-secundario oculto" type="button">Cancelar edición</button><button id="limpiar-formulario" class="boton boton-texto" type="reset">Limpiar</button></div>
+            <p id="mensaje-formulario" class="mensaje-formulario campo-completo" role="status"></p>
+          </form>
+        </div>
+      </section>
+
+      <section id="vista-resumen" class="vista" aria-labelledby="titulo-resumen">
+        <div class="cabecera-vista"><div><p class="sobretitulo">VISTA GENERAL</p><h1 id="titulo-resumen">Resumen de la biblioteca</h1><p class="subtitulo">Las estadísticas se calculan a partir de los libros y préstamos registrados.</p></div></div>
+        <div id="tarjetas-resumen" class="resumen-grande"></div>
+        <div class="panel ajustes-panel">
+          <div><h2>Preferencias</h2><p class="subtitulo">Personaliza la apariencia y los datos de ejemplo.</p></div>
+          <label class="casilla"><input id="ajuste-tema" type="checkbox"><span>Usar tema oscuro</span></label>
+          <div class="zona-peligro"><div><strong>Restablecer biblioteca</strong><p>Restaura los libros y préstamos de ejemplo. Esta acción sustituye los datos actuales.</p></div><button id="restablecer-datos" class="boton boton-peligro" type="button">Restablecer datos</button></div>
+          <p id="mensaje-ajustes" class="mensaje-formulario" role="status"></p>
+        </div>
+      </section>
+      <footer class="pie-pagina">Biblioteca Digital <span>·</span> Proyecto académico de Programación Web</footer>
+    </main>
+  </div>
+
+  <dialog id="modal-prestamo" class="modal">
+    <form id="formulario-prestamo" method="dialog">
+      <button class="cerrar-modal" type="button" data-cerrar-modal aria-label="Cerrar">×</button>
+      <p class="sobretitulo">NUEVO PRÉSTAMO</p><h2>¿Quién se lleva el libro?</h2>
+      <p id="nombre-libro-modal" class="subtitulo"></p>
+      <input id="id-libro-prestamo" type="hidden">
+      <div class="campo"><label for="persona-prestamo">Nombre de la persona <span>*</span></label><input id="persona-prestamo" type="text" minlength="2" maxlength="40" required placeholder="Nombre y apellidos"></div>
+      <p id="mensaje-modal-prestamo" class="mensaje-formulario" role="status"></p>
+      <button class="boton boton-principal boton-ancho" type="submit">Confirmar préstamo</button>
+    </form>
+  </dialog>
+
+  <dialog id="modal-confirmacion" class="modal">
+    <form method="dialog">
+      <button class="cerrar-modal" type="button" data-cerrar-modal aria-label="Cerrar">×</button>
+      <p class="sobretitulo">CONFIRMAR ACCIÓN</p><h2 id="titulo-confirmacion">¿Estás segura?</h2><p id="texto-confirmacion" class="subtitulo"></p>
+      <div class="acciones-formulario"><button id="confirmar-accion" class="boton boton-peligro" type="button">Confirmar</button><button class="boton boton-secundario" type="button" data-cerrar-modal>Cancelar</button></div>
+    </form>
+  </dialog>
+  <div id="notificaciones" class="notificaciones" aria-live="polite" aria-atomic="true"></div>
+</body>
+</html>
